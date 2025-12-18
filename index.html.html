@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprendo Tranquilo</title>
+
+<style>
+body{
+  font-family:"Comic Sans MS", Arial, sans-serif;
+  background:#f5f7ff;
+  margin:0;
+  text-align:center;
+}
+header{
+  background:#8ecae6;
+  padding:20px;
+  font-size:30px;
+  font-weight:bold;
+  color:#023047;
+}
+button{
+  background:#ffb703;
+  border:none;
+  padding:15px 25px;
+  margin:10px;
+  font-size:22px;
+  border-radius:20px;
+  cursor:pointer;
+}
+button:hover{background:#fb8500;}
+section{display:none;padding:20px;}
+.card{
+  background:white;
+  margin:15px auto;
+  padding:20px;
+  border-radius:25px;
+  width:80%;
+  max-width:400px;
+  font-size:40px;
+}
+.color-box{
+  width:120px;
+  height:120px;
+  margin:15px auto;
+  border-radius:20px;
+}
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  max-width:300px;
+  margin:auto;
+}
+.memory-card{
+  background:white;
+  border-radius:20px;
+  font-size:40px;
+  padding:30px 0;
+  cursor:pointer;
+}
+.memory-card.matched{
+  background:#b7f0c1;
+}
+footer{
+  margin:30px;
+  font-size:14px;
+  color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<header>🌈 Aprendo Tranquilo 🌈</header>
+
+<!-- INICIO -->
+<section id="inicio" style="display:block;">
+  <p style="font-size:24px;">Aprender sin apuro 😊</p>
+  <button onclick="mostrar('letras')">🔤 Letras</button>
+  <button onclick="mostrar('numeros')">🔢 Números</button>
+  <button onclick="mostrar('colores')">🎨 Colores</button>
+  <button onclick="mostrar('memoria')">🧠 Memoria</button>
+  <button onclick="mostrar('sonidosAnimales')">🐾 Sonidos</button>
+</section>
+
+<!-- LETRAS -->
+<section id="letras">
+  <h2>🔤 Letras</h2>
+  <div class="card" onclick="hablar('A de abeja')">A 🐝</div>
+  <div class="card" onclick="hablar('B de ballena')">B 🐋</div>
+  <div class="card" onclick="hablar('C de cabra')">C 🐐</div>
+  <button onclick="volver()">⬅ Volver</button>
+</section>
+
+<!-- NUMEROS -->
+<section id="numeros">
+  <h2>🔢 Números</h2>
+  <div class="card" onclick="hablar('Uno')">1 ☝️</div>
+  <div class="card" onclick="hablar('Dos')">2 ✌️</div>
+  <div class="card" onclick="hablar('Tres')">3 🤟</div>
+  <button onclick="volver()">⬅ Volver</button>
+</section>
+
+<!-- COLORES -->
+<section id="colores">
+  <h2>🎨 Colores</h2>
+  <div class="card" onclick="hablar('Rojo')">Rojo
+    <div class="color-box" style="background:red;"></div>
+  </div>
+  <div class="card" onclick="hablar('Azul')">Azul
+    <div class="color-box" style="background:blue;"></div>
+  </div>
+  <div class="card" onclick="hablar('Amarillo')">Amarillo
+    <div class="color-box" style="background:yellow;"></div>
+  </div>
+  <button onclick="volver()">⬅ Volver</button>
+</section>
+
+<!-- MEMORIA -->
+<section id="memoria">
+  <h2>🧠 Juego de Memoria</h2>
+  <p>Encuentra los pares 😊</p>
+  <div class="game-grid" id="game"></div>
+  <button onclick="iniciarMemoria()">🔄 Reiniciar</button>
+  <button onclick="volver()">⬅ Volver</button>
+</section>
+
+<!-- SONIDOS DE ANIMALES -->
+<section id="sonidosAnimales">
+  <h2>🐾 ¿Qué animal es?</h2>
+  <p>Escucha y elige 😊</p>
+
+  <button onclick="reproducirAnimal()">🔊 Escuchar sonido</button>
+
+  <div>
+    <button onclick="responder('perro')">🐶 Perro</button>
+    <button onclick="responder('gato')">🐱 Gato</button>
+    <button onclick="responder('vaca')">🐮 Vaca</button>
+  </div>
+
+  <p id="resultado" style="font-size:22px;"></p>
+
+  <button onclick="volver()">⬅ Volver</button>
+</section>
+
+<footer>
+Hecho con ❤️ para aprender tranquilo
+</footer>
+
+<script>
+/* NAVEGACIÓN */
+function mostrar(id){
+  document.querySelectorAll("section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
+}
+function volver(){mostrar("inicio");}
+
+/* VOZ */
+function hablar(texto){
+  const voz = new SpeechSynthesisUtterance(texto);
+  voz.lang="es-ES";
+  voz.rate=0.8;
+  speechSynthesis.speak(voz);
+}
+
+/* MEMORIA */
+const emojis = ["🍎","🍌","🍓","🍇"];
+let cartas = [];
+let seleccionadas = [];
+
+function iniciarMemoria(){
+  cartas = [...emojis, ...emojis].sort(()=>Math.random()-0.5);
+  const game = document.getElementById("game");
+  game.innerHTML="";
+  seleccionadas=[];
+  cartas.forEach(e=>{
+    const div=document.createElement("div");
+    div.className="memory-card";
+    div.textContent="❓";
+    div.onclick=()=>voltear(div,e);
+    game.appendChild(div);
+  });
+}
+
+function voltear(card,emoji){
+  if(card.classList.contains("matched")||seleccionadas.length==2)return;
+  card.textContent=emoji;
+  seleccionadas.push({card,emoji});
+  if(seleccionadas.length==2){
+    setTimeout(()=>{
+      if(seleccionadas[0].emoji==seleccionadas[1].emoji){
+        seleccionadas.forEach(c=>c.card.classList.add("matched"));
+        hablar("Muy bien");
+      }else{
+        seleccionadas.forEach(c=>c.card.textContent="❓");
+      }
+      seleccionadas=[];
+    },800);
+  }
+}
+iniciarMemoria();
+
+/* SONIDOS ANIMALES */
+let animalCorrecto = "";
+
+function reproducirAnimal(){
+  const animales = ["perro","gato","vaca"];
+  animalCorrecto = animales[Math.floor(Math.random()*animales.length)];
+
+  if(animalCorrecto==="perro") hablar("guau guau");
+  if(animalCorrecto==="gato") hablar("miau");
+  if(animalCorrecto==="vaca") hablar("mu");
+  
+  document.getElementById("resultado").textContent="👂 Escucha con atención";
+}
+
+function responder(animal){
+  if(animal===animalCorrecto){
+    document.getElementById("resultado").textContent="🎉 ¡Muy bien!";
+    hablar("Excelente");
+  }else{
+    document.getElementById("resultado").textContent="😊 Intenta otra vez";
+  }
+}
+</script>
+
+</body>
+</html>
